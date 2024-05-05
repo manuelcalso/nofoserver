@@ -47,6 +47,25 @@ router.post("/generate-text", async (req, res) => {
   }
 });
 
+router.post("/generate-image", async (req, res) => {
+  try {
+    console.log("Entrando a generar imagen");
+    const userMessage = req.body.prompt;
+    const response = await openai.images.generate({
+      model: "dall-e-3",
+      prompt: userMessage,
+      n: 1,
+      size: "1024x1024",
+    });
+    const imageUrl = response.data[0].url;
+    console.log("Imagen generada:", imageUrl);
+    res.json({ imageUrl });
+  } catch (error) {
+    console.error("Error al generar la imagen:", error);
+    res.status(500).json({ error: "Failed to generate image" });
+  }
+});
+
 app.use("/api", router);
 
 const PORT = process.env.PORT || 3000;
