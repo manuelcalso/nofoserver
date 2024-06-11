@@ -66,6 +66,28 @@ router.post("/generate-image", async (req, res) => {
   }
 });
 
+router.post("/generate-paragraph", async (req, res) => {
+  try {
+    const { titles } = req.body; // Espera un array de títulos
+    const results = await Promise.all(titles.map(async (title) => {
+      const response = await openai.chat.completions.create({
+        model: "gpt-3.5-turbo",
+        messages: [{ role: "user", content: `Genera un texto sobre el siguiente título: ${title}` }],
+        n: 1,
+      });
+      return {
+        title,
+        text: response.choices[0].message.content.trim(),
+      };
+    }));
+
+    res.json(results);
+  } catch (error) {
+    console.error("Error with OpenAI API:", error);
+    res.status(500).json({ error: "Failed to generate text" });
+  }
+});
+
 app.use("/api", router);
 
 const PORT = process.env.PORT || 3000;
