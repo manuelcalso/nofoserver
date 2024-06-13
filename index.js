@@ -31,14 +31,14 @@ router.post("/openai", async (req, res) => {
 
 router.post("/generate-text", async (req, res) => {
   try {
-    console.log("entrando a generate text")
+    console.log("entrando a generate text");
     const userMessage = req.body.prompt;
     const response = await openai.chat.completions.create({
-      messages: [{ role: "user", content: userMessage }], 
+      messages: [{ role: "user", content: userMessage }],
       model: "gpt-3.5-turbo",
       n: 1,
     });
-    const generatedText = response.choices[0].message.content
+    const generatedText = response.choices[0].message.content;
     console.log("Generated text:", generatedText);
     res.json({ generatedText: generatedText });
   } catch (error) {
@@ -69,17 +69,24 @@ router.post("/generate-image", async (req, res) => {
 router.post("/generate-paragraph", async (req, res) => {
   try {
     const { titles } = req.body; // Espera un array de títulos
-    const results = await Promise.all(titles.map(async (title) => {
-      const response = await openai.chat.completions.create({
-        model: "gpt-3.5-turbo",
-        messages: [{ role: "user", content: `Genera un texto sobre el siguiente título: ${title}` }],
-        n: 1,
-      });
-      return {
-        title,
-        text: response.choices[0].message.content.trim(),
-      };
-    }));
+    const results = await Promise.all(
+      titles.map(async (title) => {
+        const response = await openai.chat.completions.create({
+          model: "gpt-3.5-turbo",
+          messages: [
+            {
+              role: "user",
+              content: `Genera un texto sobre el siguiente título: ${title}`,
+            },
+          ],
+          n: 1,
+        });
+        return {
+          title,
+          text: response.choices[0].message.content.trim(),
+        };
+      })
+    );
 
     res.json(results);
   } catch (error) {
